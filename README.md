@@ -7,10 +7,7 @@ Service for tracking cryptocurrency prices from Deribit exchange. The system aut
 - Installation and Deployment
 - API Reference
 - Monitoring and Maintenance
-- Troubleshooting
 - Testing
-- Development
-- License
 -----
 ## **Project Overview**
 Deribit Price Tracker is a service for collecting and storing cryptocurrency prices from the Deribit exchange. The application fetches current BTC/USD and ETH/USD index prices every minute, stores them in PostgreSQL, and provides a convenient REST API for accessing historical data.
@@ -209,7 +206,6 @@ curl "http://localhost:8000/api/v1/prices?ticker=btc\_usd&limit=5"
 ]
 ```
 #### **2. Get Latest Price**
-http
 
 GET /api/v1/prices/latest?ticker={ticker}
 
@@ -230,3 +226,218 @@ curl "http://localhost:8000/api/v1/prices/latest?ticker=eth\_usd"
 }
 
 ```
+#### **3. Get Prices by Date**
+
+GET /api/v1/prices/by-date?ticker={ticker}&date={date}
+
+**Parameters:**
+
+|Parameter|Type|Required|Format|Description|
+| :- | :- | :- | :- | :- |
+|ticker|string|✅|-|btc\_usd or eth\_usd|
+|date|string|✅|YYYY-MM-DD|Date filter|
+
+#### **4. Get Paginated History**
+
+GET /api/v1/prices/history?ticker={ticker}&limit={limit}&offset={offset}
+
+#### **5. Get Price Statistics**
+
+GET /api/v1/prices/stats?ticker={ticker}&days={days}
+
+**Example Response:**
+
+```json
+{
+  "ticker": "btc_usd",
+  "period_days": 7,
+  "count": 10080,
+  "min_price": 49876.54,
+  "max_price": 53456.78,
+  "avg_price": 51678.23,
+  "first_price": 51234.56,
+  "last_price": 52345.67,
+  "change": 1111.11,
+  "change_percent": 2.17
+}
+
+```
+
+### **Response Codes**
+
+|Code|Description|Possible Reasons|
+| :- | :- | :- |
+|200|Success|Request processed|
+|400|Bad Request|Invalid ticker|
+|404|Not Found|No data for period|
+|422|Validation Error|Invalid date format|
+|500|Internal Error|DB or API issues|
+
+-----
+## **Monitoring and Maintenance**
+### **Service Monitoring**
+#### **Flower (Celery Monitoring)**
+
+URL: http://localhost:5555
+
+- Task execution tracking
+- Worker statistics
+- Task history and errors
+
+#### **Health Check**
+
+curl http://localhost:8000/health
+
+```json
+{
+  "status": "healthy",
+  "timestamp": 1709577600,
+  "version": "1.0.0",
+  "services": {
+    "database": "connected",
+    "redis": "connected",
+    "deribit_api": "available"
+  }
+}
+
+```
+
+### **Logging**
+#### **Viewing Logs**
+
+```bash
+# All logs
+docker-compose logs -f
+
+# Specific service logs
+docker-compose logs -f app
+docker-compose logs -f worker
+docker-compose logs -f db
+
+# Last N lines
+docker-compose logs --tail=100 worker
+
+```
+
+#### **Log Level Configuration**
+```python
+# app/core/config.py
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+```
+
+### **Alembic Migrations**
+
+```bash
+# Create new migration
+docker-compose exec app alembic revision --autogenerate -m "description"
+
+# Apply migrations
+docker-compose exec app alembic upgrade head
+
+# Rollback one migration
+docker-compose exec app alembic downgrade -1
+
+# View history
+docker-compose exec app alembic history
+
+```
+
+### **Backup and Restore**
+
+```bash
+# Create backup
+docker-compose exec db pg_dump -U postgres deribit_db > backup_$(date +%Y%m%d).sql
+
+# Restore from backup
+cat backup_20240304.sql | docker-compose exec -T db psql -U postgres -d deribit_db
+
+# Automatic backup (cron)
+0 2 * * * cd /path/to/project && docker-compose exec -T db pg_dump -U postgres deribit_db > backups/backup_$(date +\%Y\%m\%d).sql
+
+```
+
+### **Celery Management**
+
+```bash
+# Restart workers
+docker-compose restart worker
+
+# Clear queue
+docker-compose exec redis redis-cli FLUSHALL
+
+# Check task status
+docker-compose exec worker celery -A app.worker.celery_app inspect active
+
+# Cancel task
+docker-compose exec worker celery -A app.worker.celery_app control revoke task_id
+
+```
+
+### **Performance Monitoring**
+
+```bash
+# Container resource usage
+docker stats
+
+# Log size
+du -sh logs/
+
+# Request rate
+docker-compose logs app | grep "GET" | wc -l
+
+# API response time
+curl -w "@curl-format.txt" -o /dev/null -s http://localhost:8000/api/v1/prices/latest?ticker=btc_usd
+
+```
+-----
+## **Testing**
+### **Running Tests**
+
+```bash
+# All tests with verbose output
+pytest tests/ -v
+
+# With coverage
+pytest tests/ --cov=app --cov-report=html
+
+# Specific file
+pytest tests/test_repository_async.py -v
+
+# Specific test
+pytest tests/test_api_async.py::TestAPI::test_get_latest_price -v
+
+```
+
+### **Code Coverage**
+
+```bash
+# Run with coverage report
+pytest --cov=app --cov-report=term --cov-report=html
+
+# Open HTML report
+open htmlcov/index.html
+
+# Enforce minimum coverage (requires >80%)
+pytest --cov=app --cov-fail-under=80
+
+```
+
+### **Integration Testing**
+
+```bash
+# Run tests with real database
+docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
+# Load testing with Locust
+locust -f tests/locustfile.py --host=http://localhost:8000
+
+```
+
+### **Adding New Features**
+1. **Add interface** in app/domain/interfaces.py
+2. **Implement use case** in app/use\_cases/
+3. **Add endpoint** in app/api/routes.py
+4. **Write tests** in tests/
+5. **Update documentation**
+
