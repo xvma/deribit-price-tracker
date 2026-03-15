@@ -39,38 +39,22 @@ Deribit Price Tracker is a service for collecting and storing cryptocurrency pri
 The project strictly follows Clean Architecture principles with clear separation of concerns:
 
 ┌─────────────────────────────────────────────────────┐
-
 │              Presentation Layer (API)               │
-
 │              app/api/routes.py                      │
-
 │              FastAPI endpoints, HTTP handling       │
-
 ├─────────────────────────────────────────────────────┤
-
 │                 Use Cases Layer                     │
-
-│              app/use\_cases/                         │
-
+│              app/use\_cases/                        │
 │              Business logic                         │
-
 ├─────────────────────────────────────────────────────┤
-
 │                  Domain Layer                       │
-
 │              app/domain/                            │
-
 │              Entities and interfaces                │
-
 ├─────────────────────────────────────────────────────┤
-
 │              Infrastructure Layer                   │
-
 │              app/infrastructure/                    │
-
 │              Repositories, API clients              │
-
-└──────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────┘
 
 **Rationale**: Clean Architecture ensures:
 
