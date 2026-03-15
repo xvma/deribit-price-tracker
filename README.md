@@ -38,39 +38,27 @@ Deribit Price Tracker is a service for collecting and storing cryptocurrency pri
 ### **1. Architectural Approach: Clean Architecture**
 The project strictly follows Clean Architecture principles with clear separation of concerns:
 
+
+```text
 ┌─────────────────────────────────────────────────────┐
-
 │              Presentation Layer (API)               │
-
 │              app/api/routes.py                      │
-
 │              FastAPI endpoints, HTTP handling       │
-
 ├─────────────────────────────────────────────────────┤
-
 │                 Use Cases Layer                     │
-
-│              app/use\_cases/                         │
-
+│              app/use\_cases/                        │
 │              Business logic                         │
-
 ├─────────────────────────────────────────────────────┤
-
 │                  Domain Layer                       │
-
 │              app/domain/                            │
-
 │              Entities and interfaces                │
-
 ├─────────────────────────────────────────────────────┤
-
 │              Infrastructure Layer                   │
-
 │              app/infrastructure/                    │
-
 │              Repositories, API clients              │
+└─────────────────────────────────────────────────────┘
 
-└──────────────────────────────────────────────┘
+```
 
 **Rationale**: Clean Architecture ensures:
 
@@ -204,53 +192,41 @@ GET /api/v1/prices?ticker={ticker}&limit={limit}
 |limit|integer|❌|1000|Max records (1-10000)|
 
 **Example Request:**
-
+```bash
 curl "http://localhost:8000/api/v1/prices?ticker=btc\_usd&limit=5"
+```
 
 **Example Response:**
-
+```json
 [
-
-`  `{
-
-`    `"id": 12345,
-
-`    `"ticker": "btc\_usd",
-
-`    `"price": 52345.67,
-
-`    `"timestamp": 1709577600,
-
-`    `"created\_at": "2024-03-04T12:00:00"
-
-`  `}
-
+  {
+    "id": 12345,
+    "ticker": "btc_usd",
+    "price": 52345.67,
+    "timestamp": 1709577600,
+    "created_at": "2024-03-04T12:00:00"
+  }
 ]
+```
 #### **2. Get Latest Price**
 http
 
 GET /api/v1/prices/latest?ticker={ticker}
 
 **Example Request:**
-
-bash
+```bash
 
 curl "http://localhost:8000/api/v1/prices/latest?ticker=eth\_usd"
+```
 
 **Example Response:**
-
-json
-
+```json
 {
-
-`  `"id": 12345,
-
-`  `"ticker": "eth\_usd",
-
-`  `"price": 3125.89,
-
-`  `"timestamp": 1709577600,
-
-`  `"created\_at": "2024-03-04T12:00:00"
-
+  "id": 12345,
+  "ticker": "eth_usd",
+  "price": 3125.89,
+  "timestamp": 1709577600,
+  "created_at": "2024-03-04T12:00:00"
 }
+
+```
