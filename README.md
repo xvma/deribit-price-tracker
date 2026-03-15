@@ -423,17 +423,6 @@ pytest --cov=app --cov-fail-under=80
 
 ```
 
-### **Integration Testing**
-
-```bash
-# Run tests with real database
-docker-compose -f docker-compose.test.yml up --abort-on-container-exit
-
-# Load testing with Locust
-locust -f tests/locustfile.py --host=http://localhost:8000
-
-```
-
 ### **Adding New Features**
 1. **Add interface** in app/domain/interfaces.py
 2. **Implement use case** in app/use\_cases/
