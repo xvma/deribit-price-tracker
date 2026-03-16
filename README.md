@@ -396,32 +396,10 @@ curl -w "@curl-format.txt" -o /dev/null -s http://localhost:8000/api/v1/prices/l
 
 ```bash
 # All tests with verbose output
-pytest tests/ -v
-
-# With coverage
-pytest tests/ --cov=app --cov-report=html
-
-# Specific file
-pytest tests/test_repository_async.py -v
-
-# Specific test
-pytest tests/test_api_async.py::TestAPI::test_get_latest_price -v
+python run_tests.py
 
 ```
 
-### **Code Coverage**
-
-```bash
-# Run with coverage report
-pytest --cov=app --cov-report=term --cov-report=html
-
-# Open HTML report
-open htmlcov/index.html
-
-# Enforce minimum coverage (requires >80%)
-pytest --cov=app --cov-fail-under=80
-
-```
 
 ### **Adding New Features**
 1. **Add interface** in app/domain/interfaces.py
