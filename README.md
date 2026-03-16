@@ -147,7 +147,7 @@ curl http://localhost:8000/health
 curl http://localhost:8000/api/v1/prices/latest?ticker=btc\_usd
 ### **Method 2: Local Development**
 #### **Step 1: Clone and Setup**
-git clone https://github.com/yourusername/deribit-price-tracker.git
+git clone https://github.com/xvma/deribit-price-tracker.git
 
 cd deribit-price-tracker
 
